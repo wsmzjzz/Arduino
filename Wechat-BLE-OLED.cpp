@@ -18,15 +18,12 @@ int okBtn = 10;
 bool leftRlsed = true;
 bool rightRlsed = true;
 bool okRlsed = true;
-int oledState = 222;
 
 /**
  * 0: 
 */
-String part[5] = {"0.Chest", "1.Back", "2.Legs", "3.Arms"};
-String chest[] = {"0.Press", "1.Flies", "2.Pec-Deck", "3.Pushup"};
-String Arms[] = {"0.Bi-Curl", "1.Pushdown", "2.Press", "3.Raise"};
-String Legs[] = {"0.Squat", "1.Deadlift", "2.Press"};
+int oledState = 0;
+String part[5] = {"Chest", "Shoulders", "Back", "Legs", "Core"};
 
 void output(int size, int x, int y, int num)
 {
@@ -67,49 +64,42 @@ void setup()
 
 void loop()
 {
-    if (oledState == 111) {
-        if (pressed(leftBtn) && leftRlsed)
-        {
-            leftRlsed = false;
-            --RM;
-            // delay(150);
-            // oled.display(); // 开显示
-            // goto NEXT;
-        }
-        if (!pressed(leftBtn)) {
-            leftRlsed = true;
-        }
-
-        if (pressed(rightBtn) && rightRlsed)
-        {
-            rightRlsed = false;
-            ++RM;
-            // delay(150);
-            // output(2, 60, 30, ++workoutTime);
-            // oled.display(); // 开显示
-            // goto NEXT;
-        }
-        if (!pressed(rightBtn)) {
-            rightRlsed = true;
-        }
+    if (pressed(leftBtn) && leftRlsed)
+    {
+        leftRlsed = false;
+        workoutTime -= 10;
+        // delay(150);
+        // oled.display(); // 开显示
+        // goto NEXT;
     }
-    if (oledState == 222) {
-        oled.clearDisplay(); //清屏
-
-        output(2, 0, 0, "G");
-        output(2, 0 + 13, 0, group);
-
-        output(2, 30, 0, "R");
-        output(2, 30 + 13, 0, RM);
-
-        // String s = "hello";
-        output(2,10,30, "time");
-        output(2, 60, 30, ++workoutTime);
-
-        oled.display(); // 开显示
-
-        delay(1000);
+    if (!pressed(leftBtn)) {
+        leftRlsed = true;
     }
+
+    if (pressed(rightBtn) && rightRlsed)
+    {
+        rightRlsed = false;
+        workoutTime += 10;
+        // delay(150);
+        // output(2, 60, 30, ++workoutTime);
+        // oled.display(); // 开显示
+        // goto NEXT;
+    }
+    if (!pressed(rightBtn)) {
+        rightRlsed = true;
+    }
+    oled.clearDisplay(); //清屏
+
+    output(2, 0, 0, "G");
+    output(2, 0 + 13, 0, group);
+
+    output(2, 30, 0, "R");
+    output(2, 30 + 13, 0, RM);
+    output(2, 60, 30, workoutTime);
+
+    oled.display(); // 开显示
+
+    // delay(1000);
 
 NEXT:;
 }
