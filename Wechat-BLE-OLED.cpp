@@ -8,17 +8,18 @@
 #define OLED_RESET 4
 Adafruit_SSD1306 oled(128, 64, &Wire, OLED_RESET);
 
-int group = 1; // 训练组数
+int group = 0; // 训练组数
 int lb = 5;    // weight
 int RM = 10;   // Repetition
 int totalTime = 0;
-int workoutTime = 0; // each training time
-int leftBtn = 12;    // minus- :
-int rightBtn = 11;   // plus+ :
-int okBtn = 10;      // 
-boolean leftRlsed = true;  // ?Released
+int workoutTime = 0;      // each training time
+int leftBtn = 12;         // minus- :
+int rightBtn = 11;        // plus+ :
+int okBtn = 10;           //
+boolean leftRlsed = true; // ?Released
 boolean rightRlsed = true;
 boolean okRlsed = true;
+boolean lbChoosed = false;
 int oledState = 000; // 000:Menu 111:BreakTime 222:Training 444:End
 
 /**
@@ -73,87 +74,137 @@ void setup()
 void loop()
 {
     // Menu
-    if (oledState == 000) {
-        // Press any key to 'BreakTime'
-        if (pressed(leftBtn) || pressed(rightBtn) || pressed(okBtn)) {
+    if (oledState == 000)
+    {
+        if (pressed(leftBtn) || pressed(rightBtn))
+        {
             oledState = 111;
             // delay(200);
         }
-        oled.clearDisplay();      //清屏
+        oled.clearDisplay(); //清屏
         output(2, 0, 0, "Menu");
         oled.display();
         // delay(1500);
 
-    }
+    } // end of Menu
     // BreakTime
     if (oledState == 111)
     {
-        // Combination key shortcut to 'End': -&ok | +&ok
+        // Combination shortcut to 'Fin.': -&ok | +&ok
         if (pressed(leftBtn) && leftRlsed && pressed(okBtn) ||
-            pressed(rightBtn) && rightRlsed && pressed(okBtn)) {
-                oledState = 444;
+            pressed(rightBtn) && rightRlsed && pressed(okBtn))
+        {
+            oledState = 444;
 
-                oled.clearDisplay(); //清屏
-                output(3, 20, 20, "DONE!");
-                oled.display();
-                delay(1000);
+            oled.clearDisplay(); //清屏
+            output(3, 20, 20, "DONE!");
+            oled.display();
+            delay(1000);
         }
         // to 'Training'
         if (pressed(okBtn))
         {
-            oledState = 222; // 训练模式
-            workoutTime = 0; // 单次/一组训练时间
-            ++group;         // 组数
+            // first-time-press of 'ok': confirm LBS
+            if (!lbChoosed && okRlsed) 
+            {
+                lbChoosed = true;
+                okRlsed = false;
+            }
+            // second-time: confirm REP & to Training
+            if (lbChoosed && okRlsed)
+            {
+                oledState = 222; // 训练模式
+                workoutTime = 0; // 单次/一组训练时间
+                ++group;         // 组数
 
-            // 倒计时3 2 1 GO
-            oled.clearDisplay(); //清屏
-            output(4, 60, 20, "3");
-            oled.display();
-            delay(1000);
-            oled.clearDisplay(); //清屏
-            output(4, 60, 20, "2");
-            oled.display();
-            delay(1000);
-            oled.clearDisplay(); //清屏
-            output(4, 60, 20, "1");
-            oled.display();
-            delay(1000);
-            oled.clearDisplay(); //清屏
-            output(4, 50, 20, "GO");
-            oled.display();
-            delay(1000);
+                // 倒计时3 2 1 GO
+                oled.clearDisplay(); //清屏
+                output(4, 60, 20, "3");
+                oled.display();
+                delay(1000);
+                oled.clearDisplay(); //清屏
+                output(4, 60, 20, "2");
+                oled.display();
+                delay(1000);
+                oled.clearDisplay(); //清屏
+                output(4, 60, 20, "1");
+                oled.display();
+                delay(1000);
+                oled.clearDisplay(); //清屏
+                output(4, 50, 20, "GO");
+                oled.display();
+                delay(1000);
 
-            // delay(200);
-            goto NEXT;
+                // delay(200);
+                goto NEXT;
+            }
         }
-        if (pressed(leftBtn) && leftRlsed) // pressed again
-        {
-            leftRlsed = false;
-            --RM;
-            if (RM < 1) RM = 1; // min:1
-        }
-        if (!pressed(leftBtn))
-        {
-            leftRlsed = true;
-        }
+        if (!pressed(okBtn)) okRlsed = true;
+        if (!lbChoosed)
+        {                                      // set LBS
+            if (pressed(leftBtn) && leftRlsed) // pressed again
+            {
+                leftRlsed = false;
+                --lb;
+                if (lb < 1)
+                    lb = 1; // min:1
+            }
+            if (!pressed(leftBtn))
+            {
+                leftRlsed = true;
+            }
 
-        if (pressed(rightBtn) && rightRlsed) // pressed again
-        {
-            rightRlsed = false;
-            ++RM;
-            if (RM > 25) RM = 25; // max:25
+            if (pressed(rightBtn) && rightRlsed) // pressed again
+            {
+                rightRlsed = false;
+                ++lb;
+                if (lb > 25)
+                    lb = 25; // max:25
+            }
+            if (!pressed(rightBtn))
+            {
+                rightRlsed = true;
+            }
         }
-        if (!pressed(rightBtn))
-        {
-            rightRlsed = true;
+        else
+        {                                      // set REP
+            if (pressed(leftBtn) && leftRlsed) // pressed again
+            {
+                leftRlsed = false;
+                --RM;
+                if (RM < 1)
+                    RM = 1; // min:1
+            }
+            if (!pressed(leftBtn))
+            {
+                leftRlsed = true;
+            }
+
+            if (pressed(rightBtn) && rightRlsed) // pressed again
+            {
+                rightRlsed = false;
+                ++RM;
+                if (RM > 25)
+                    RM = 25; // max:25
+            }
+            if (!pressed(rightBtn))
+            {
+                rightRlsed = true;
+            }
         }
         oled.clearDisplay(); //清屏
 
-        output(2, 10, 30, "REP:");
-        output(2, 70, 30, RM);
+        if (!lbChoosed)
+            output(2, 10, 15, ">");
+        else
+            output(2, 10, 35, ">");
+        output(2, 25, 15, "LBS:");
+        output(2, 75, 15, lb);
+        output(2, 25, 35, "REP:");
+        output(2, 75, 35, RM);
 
-        oled.display(); // 开显示
-    }
+        oled.display();   // 开显示
+    }                     // end of BreakTime
     if (oledState == 222) // Training Mode
     {
         if (pressed(okBtn)) // to 'Break'
@@ -162,6 +213,7 @@ void loop()
             // Statistic
             totalTime += workoutTime;
             workoutTime = 0;
+            lbChoosed = false;
 
             oled.clearDisplay(); //清屏
             output(4, 0, 18, "Break");
@@ -185,14 +237,16 @@ void loop()
         oled.display(); // 开显示
 
         delay(1000); // time counting
-    }
-    // End
-    if (oledState == 444) {
-        // Press any key to 'Menu' 
-        if (pressed(leftBtn) || pressed(rightBtn) || pressed(okBtn)) {
+    }                // end of Training
+    // Finished
+    if (oledState == 444)
+    {
+        // Press any key to 'Menu'
+        if (pressed(leftBtn) || pressed(rightBtn) || pressed(okBtn))
+        {
             oledState = 000;
             // End words
-            oled.clearDisplay();      //清屏
+            oled.clearDisplay(); //清屏
             output(2, 0, 0, "Keep it up & Go for it");
             oled.display();
             delay(1500);
@@ -207,7 +261,7 @@ void loop()
         oled.display();
         // delay(1000);
 
-    }
+    } // end of finished
 
 NEXT:
     int a = 1;
