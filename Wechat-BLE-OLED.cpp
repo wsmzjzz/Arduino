@@ -59,20 +59,20 @@ String itemName(int index)
         return "Pushup";
     if (index == 4)
         return "Squat";
-    if (index == 5)
-        return "Row";
-    if (index == 6)
-        return "Pullup";
-    if (index == 7)
-        return "Deadlift";
-    if (index == 8)
-        return "Lunge";
-    if (index == 9)
-        return "Situp";
-    if (index == 10)
-        return "BiCurl";
-    if (index == 11)
-        return "PsDown";
+    // if (index == 5)
+    //     return "Row";
+    // if (index == 6)
+    //     return "Pullup";
+    // if (index == 7)
+    //     return "Deadlift";
+    // if (index == 8)
+    //     return "Lunge";
+    // if (index == 9)
+    //     return "Situp";
+    // if (index == 10)
+    //     return "BiCurl";
+    // if (index == 11)
+    //     return "PsDown";
 }
 //格式化发送
 void wxxcx_send(String addr, String data)
@@ -88,11 +88,16 @@ void wxxcx_general_deal(String data)
     if (data == "delete")
     {
         --numTrainItems;
-    } else {
+    }
+    else
+    {
         ++numTrainItems;
-        if (data == "pr") trainItems[numTrainItems] = 0;
-        if (data == "fl") trainItems[numTrainItems] = 2;
-        if (data == "psup") trainItems[numTrainItems] = 3;
+        if (data == "pr")
+            trainItems[numTrainItems] = 0;
+        // if (data == "fl")
+        //     trainItems[numTrainItems] = 2;
+        // if (data == "psup")
+        //     trainItems[numTrainItems] = 3;
         // if (data == "sq") trainItems[numTrainItems] = 4;
         // if (data == "rw") trainItems[numTrainItems] = 5;
         // if (data == "plup") trainItems[numTrainItems] = 6;
@@ -120,8 +125,8 @@ void wxxcx_protocol_deal(String addr, String ctent)
     {
         if (ctent == "true")
         {
-            delay(100);
-            wxxcx_send(input0, "Hello");
+            // delay(100);
+            // wxxcx_send(input0, "Hello");
             digitalWrite(ledPin, HIGH); //点亮小灯
         }
         else
@@ -254,24 +259,24 @@ void setup()
 //----------------------------------------------
 void loop()
 {
-    // Bluetooth info exchange
-
-    // read info from HC-08(from Wechat) in one while loop
-    // while (Serial.available() > 0)
-    // {
-    //     comdata += char(Serial.read());
-    //     delay(2);
-    // }
-    // if (comdata.length() > 0)
-    // {
-    //     Serial.println(comdata);
-    //     // do whatever
-    //     wxxcx_analysis(comdata);
-    //     comdata = "";
-    // }
     // Menu
     if (oledState == 000)
     {
+        // Bluetooth info exchange
+        // read info from HC-08(from Wechat) in one while loop
+        while (Serial.available() > 0)
+        {
+            comdata += char(Serial.read());
+            delay(3);
+        }
+        if (comdata.length() > 0)
+        {
+            Serial.println(comdata);
+            // do whatever
+            wxxcx_analysis(comdata);
+            comdata = "";
+        }
+
         if (pressed(okBtn))
         {
             okRlsed = false;
@@ -288,7 +293,7 @@ void loop()
         // output(2, 0, 0, "Menu");
         for (int i = 1; i <= numTrainItems; ++i)
         {
-            output(2, 0, 15 * (i-1), itemName(trainItems[i]));
+            output(2, 0, 15 * (i - 1), itemName(trainItems[i]));
         }
         oled.display();
         // delay(1500);
@@ -301,7 +306,7 @@ void loop()
         if (pressed(leftBtn) && leftRlsed && pressed(okBtn) ||
             pressed(rightBtn) && rightRlsed && pressed(okBtn))
         {
-            
+
             oledState = 444;
 
             oled.clearDisplay(); //清屏
