@@ -25,8 +25,8 @@ int oledState = 000; // 000:Menu 111:BreakTime 222:Training 444:End
 String comdata = "";
 // 绿光LED for testing
 int ledPin = 13;
-int trainContent[20];
-int ptrTrainCtnt = 0;
+int trainContent[10] = {0, 1, 2, 3, 4};
+int ptrTrainCtnt = 3;
 // 小组件编号 使用宏定义节省全局变量存储空间
 #define Press "000100"
 #define IncPress "000101"
@@ -46,33 +46,59 @@ int ptrTrainCtnt = 0;
 #define vol "020507"
 #define input0 "010400"
 
-String itemName(int index) {
-    if (index == 0) return "Press";
-    if (index == 1) return "IncPress";
-    if (index == 2) return "Flies";
-    if (index == 3) return "Pushup";
-    if (index == 4) return "Squat";
-    if (index == 5) return "Row";
-    if (index == 6) return "Pullup";
-    if (index == 7) return "Deadlift";
-    if (index == 8) return "Lunge";
-    if (index == 9) return "Situp";
-    if (index == 10) return "BiCurl";
-    if (index == 11) return "PsDown";
+String itemName(int index)
+{
+    if (index == 0)
+        return "Press";
+    if (index == 1)
+        return "IncPress";
+    if (index == 2)
+        return "Flies";
+    if (index == 3)
+        return "Pushup";
+    if (index == 4)
+        return "Squat";
+    if (index == 5)
+        return "Row";
+    if (index == 6)
+        return "Pullup";
+    if (index == 7)
+        return "Deadlift";
+    if (index == 8)
+        return "Lunge";
+    if (index == 9)
+        return "Situp";
+    if (index == 10)
+        return "BiCurl";
+    if (index == 11)
+        return "PsDown";
 }
-int itemIndex(String name) {
-    if (name == "press") return 0;
-    if (name == "incpress") return 1;
-    if (name == "flies") return 2;
-    if (name == "pushup") return 3;
-    if (name == "squat") return 4;
-    if (name == "row") return 5;
-    if (name == "pullup") return 6;
-    if (name == "deadlift") return 7;
-    if (name == "lunge") return 8;
-    if (name == "situp") return 9;
-    if (name == "bicurl") return 10;
-    if (name == "pushdown") return 11;
+int itemIndex(String name)
+{
+    if (name == "press")
+        return 0;
+    if (name == "incpress")
+        return 1;
+    if (name == "flies")
+        return 2;
+    if (name == "pushup")
+        return 3;
+    if (name == "squat")
+        return 4;
+    if (name == "row")
+        return 5;
+    if (name == "pullup")
+        return 6;
+    if (name == "deadlift")
+        return 7;
+    if (name == "lunge")
+        return 8;
+    if (name == "situp")
+        return 9;
+    if (name == "bicurl")
+        return 10;
+    if (name == "pushdown")
+        return 11;
 }
 
 //格式化发送
@@ -89,12 +115,13 @@ void wxxcx_general_deal(String data)
     if (data == "delete" && ptrTrainCtnt > 0)
     {
         --ptrTrainCtnt;
-    } else {
-        Serial.println("Here");
+    }
+    else
+    {
+        //        Serial.println("Here");
         trainContent[++ptrTrainCtnt] = itemIndex(data);
-        Serial.println("Now Here");
-        Serial.println(trainContent[ptrTrainCtnt]);
-
+        //        Serial.println("Now Here");
+        //        Serial.println(trainContent[ptrTrainCtnt]);
     }
     // if (data == "get") //按键发送过来的自定义数据
     // {
@@ -109,8 +136,8 @@ void wxxcx_protocol_deal(String addr, String ctent)
     {
         if (ctent == "true")
         {
-            delay(100);
-            wxxcx_send(input0, "Hello");
+            //            delay(100);
+            //            wxxcx_send(input0, "Hello");
             digitalWrite(ledPin, HIGH); //点亮小灯
         }
         else
@@ -246,18 +273,18 @@ void loop()
     // Bluetooth info exchange
 
     // read info from HC-08(from Wechat) in one while loop
-    while (Serial.available() > 0)
-    {
-        comdata += char(Serial.read());
-        delay(2);
-    }
-    if (comdata.length() > 0)
-    {
-        Serial.println(comdata);
-        // do whatever
-        wxxcx_analysis(comdata);
-        comdata = "";
-    }
+    //    while (Serial.available() > 0)
+    //    {
+    //        comdata += char(Serial.read());
+    //        delay(2);
+    //    }
+    //    if (comdata.length() > 0)
+    //    {
+    //        Serial.println(comdata);
+    //        // do whatever
+    //        wxxcx_analysis(comdata);
+    //        comdata = "";
+    //    }
     // Menu
     if (oledState == 000)
     {
@@ -266,16 +293,18 @@ void loop()
             oledState = 111;
             // -----init-----
             sets = 0;
-            lb = 10;
+            lb = 9;
             RM = 10;
             lbChoosed = false;
             totalTime = 0;
             // delay(200);
         }
         oled.clearDisplay(); //清屏
-        // output(2, 0, 0, "Menu");
-        for (int i = 1; i <= ptrTrainCtnt; ++i) {
-            output(2, 0, 13*i, itemName(trainContent[i]));
+                             //        output(2, 0, 0, "Menu");
+        for (int i = 1; i <= ptrTrainCtnt; ++i)
+        {
+            Serial.println(itemName(trainContent[i]));
+            output(2, 0, 15 * i, itemName(trainContent[i]));
         }
         oled.display();
         // delay(1500);
@@ -315,19 +344,19 @@ void loop()
 
                 // Count down 3 2 1 GO
                 oled.clearDisplay(); //清屏
-                output(4, 60, 20, "3");
+                output(4, 50, 20, "3");
                 oled.display();
                 delay(1000);
                 oled.clearDisplay(); //清屏
-                output(4, 60, 20, "2");
+                output(4, 50, 20, "2");
                 oled.display();
                 delay(1000);
                 oled.clearDisplay(); //清屏
-                output(4, 60, 20, "1");
+                output(4, 50, 20, "1");
                 oled.display();
                 delay(1000);
                 oled.clearDisplay(); //清屏
-                output(4, 50, 20, "GO");
+                output(4, 45, 20, "GO");
                 oled.display();
                 delay(1000);
 
@@ -342,14 +371,18 @@ void loop()
             onButtonEvent(RM, 1, 25);
 
         oled.clearDisplay(); //清屏
+
+        output(2, 0, 0, "S");
+        output(2, 0 + 13, 0, sets + 1);
+        output(2, 30, 0, "Press");
         if (!lbChoosed)
-            output(2, 10, 15, ">");
+            output(2, 10, 25, ">");
         else
-            output(2, 10, 35, ">");
-        output(2, 25, 15, "LBS:");
-        output(2, 75, 15, lb);
-        output(2, 25, 35, "REP:");
-        output(2, 75, 35, RM);
+            output(2, 10, 45, ">");
+        output(2, 25, 25, "LB:");
+        output(2, 75, 25, lb);
+        output(2, 25, 45, "RP:");
+        output(2, 75, 45, RM);
         oled.display();   // 开显示
     }                     // end of BreakTime
     if (oledState == 222) // Training Mode
@@ -363,7 +396,7 @@ void loop()
             lbChoosed = false;
 
             oled.clearDisplay(); //清屏
-            output(4, 0, 18, "Break");
+            output(3, 20, 20, "Break");
             oled.display();
             delay(1000);
             goto NEXT;
@@ -375,11 +408,11 @@ void loop()
         output(2, 45, 0, "R");
         output(2, 45 + 13, 0, RM);
         // time x'xx
-        output(2, 0, 30, "time");
+        // output(2, 0, 30, "time");
         ++workoutTime;
-        output(2, 60, 30, workoutTime / 60);
-        output(2, 60 + 13, 30, "'");
-        output(2, 60 + 26, 30, workoutTime % 60);
+        output(3, 30, 30, workoutTime / 60);
+        output(3, 30 + 17, 30, "'");
+        output(3, 30 + 37, 30, workoutTime % 60);
 
         oled.display(); // 开显示
 
