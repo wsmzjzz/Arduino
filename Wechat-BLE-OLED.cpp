@@ -25,7 +25,7 @@ int oledState = 000; // 000:Menu 111:BreakTime 222:Training 444:End
 String comdata = "";
 // 绿光LED for testing
 int ledPin = 13;
-int trainItems[15] = {0, 1, 2, 3, 4};
+int trainItems[15] = {0, 3,4};
 int numTrainItems = 2;
 int nowItemIndex = 0;
 
@@ -60,20 +60,20 @@ String itemName(int index)
         return "Pushup";
     if (index == 4)
         return "Squat";
-    // if (index == 5)
-    //     return "Row";
-    // if (index == 6)
-    //     return "Pullup";
-    // if (index == 7)
-    //     return "Deadlift";
-    // if (index == 8)
-    //     return "Lunge";
-    // if (index == 9)
-    //     return "Situp";
-    // if (index == 10)
-    //     return "BiCurl";
-    // if (index == 11)
-    //     return "PsDown";
+    if (index == 5)
+        return "Row";
+    if (index == 6)
+        return "Pullup";
+    if (index == 7)
+        return "Deadlift";
+    if (index == 8)
+        return "Lunge";
+    if (index == 9)
+        return "Situp";
+    if (index == 10)
+        return "BiCurl";
+    if (index == 11)
+        return "PsDown";
 }
 //格式化发送
 void wxxcx_send(String addr, String data)
@@ -90,35 +90,37 @@ void wxxcx_general_deal(String data)
     {
         --numTrainItems;
         if (numTrainItems < 0) numTrainItems = 0;
+        return;
     }
     else
     {
         ++numTrainItems;
-        if (data == "pr")
-            trainItems[numTrainItems] = 0;
-        if (data == "fl")
-            trainItems[numTrainItems] = 2;
-        if (data == "psup")
-            trainItems[numTrainItems] = 3;
-        // if (data == "sq") trainItems[numTrainItems] = 4;
-        // if (data == "rw") trainItems[numTrainItems] = 5;
-        // if (data == "plup") trainItems[numTrainItems] = 6;
-        // if (data == "ddlf") trainItems[numTrainItems] = 7;
+        // if (data == "0")
+            trainItems[numTrainItems] = data.toInt();
+        // else if (data == "fl")
+        //     trainItems[numTrainItems] = 2;
+        // else if (data == "psup")
+        //     trainItems[numTrainItems] = 3;
+        // else if (data == "sq") trainItems[numTrainItems] = 4;
+        // else if (data == "rw") trainItems[numTrainItems] = 5;
+        // else if (data == "plup") trainItems[numTrainItems] = 6;
+        // else if (data == "ddlf") trainItems[numTrainItems] = 7;
         // if (data == "lg") trainItems[numTrainItems] = 8;
         // if (data == "stup") trainItems[numTrainItems] = 9;
         // if (data == "bicl") trainItems[numTrainItems] = 10;
         // if (data == "psdn") trainItems[numTrainItems] = 11;
+        Serial.println(data);
     }
 
     // else if (data == "incPress")
     // {
     //     trainContent[++ptrTrainCtnt] = 2;
     // }
-    if (data == "get") //按键发送过来的自定义数据
-    {
-        //val = analogRead(potpin); //读取模拟接口5 的值，并将其赋给val
-        wxxcx_send(vol, String(val));
-    }
+    // if (data == "get") //按键发送过来的自定义数据
+    // {
+    //     //val = analogRead(potpin); //读取模拟接口5 的值，并将其赋给val
+    //     wxxcx_send(vol, String(val));
+    // }
 }
 //协议数据处理
 void wxxcx_protocol_deal(String addr, String ctent)
@@ -157,6 +159,10 @@ void wxxcx_protocol_deal(String addr, String ctent)
 //“我的硬件”数据解析函数---不要动这个
 void wxxcx_analysis(String str)
 {
+    if (str.length() <= 2) {
+        wxxcx_general_deal(str);
+        return;
+    }
     String address = "";
     String content = "";
     int first_index = 0;
@@ -314,6 +320,7 @@ void loop()
             {
                 ++nowItemIndex;
                 sets = 0;
+                lbChoosed = false;
             }
 
             oled.clearDisplay(); //清屏
