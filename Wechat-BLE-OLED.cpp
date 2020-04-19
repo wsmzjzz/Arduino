@@ -26,7 +26,7 @@ String comdata = "";
 // 绿光LED for testing
 int ledPin = 13;
 int trainContent[10] = {0, 1, 2, 3, 4};
-int ptrTrainCtnt = 3;
+int ptrTrainCtnt = 2;
 // 小组件编号 使用宏定义节省全局变量存储空间
 #define Press "000100"
 #define IncPress "000101"
@@ -119,7 +119,7 @@ void wxxcx_general_deal(String data)
     else
     {
         //        Serial.println("Here");
-        trainContent[++ptrTrainCtnt] = itemIndex(data);
+        //        trainContent[++ptrTrainCtnt] = itemIndex(data);
         //        Serial.println("Now Here");
         //        Serial.println(trainContent[ptrTrainCtnt]);
     }
@@ -154,8 +154,8 @@ void wxxcx_protocol_deal(String addr, String ctent)
         if (data > 10)
         {
             digitalWrite(ledPin, HIGH); //点亮小灯
-            wxxcx_send("010700", String(data));
-            Serial.println("***Sent");
+            // wxxcx_send("010700", String(data));
+            // Serial.println("***Sent");
         }
         else
         {
@@ -270,24 +270,24 @@ void setup()
 //----------------------------------------------
 void loop()
 {
-    // Bluetooth info exchange
-
-    // read info from HC-08(from Wechat) in one while loop
-    //    while (Serial.available() > 0)
-    //    {
-    //        comdata += char(Serial.read());
-    //        delay(2);
-    //    }
-    //    if (comdata.length() > 0)
-    //    {
-    //        Serial.println(comdata);
-    //        // do whatever
-    //        wxxcx_analysis(comdata);
-    //        comdata = "";
-    //    }
     // Menu
-    if (oledState == 000)
+    if (oledState == 0)
     {
+        // Bluetooth info exchange
+        // read info from HC-08(from Wechat) in one while loop
+        while (Serial.available() > 0)
+        {
+            comdata += char(Serial.read());
+            delay(2);
+        }
+        if (comdata.length() > 0)
+        {
+            Serial.println(comdata);
+            // do whatever
+            wxxcx_analysis(comdata);
+            comdata = "";
+        }
+
         if (pressed(leftBtn) || pressed(rightBtn))
         {
             oledState = 111;
@@ -303,7 +303,7 @@ void loop()
                              //        output(2, 0, 0, "Menu");
         for (int i = 1; i <= ptrTrainCtnt; ++i)
         {
-            Serial.println(itemName(trainContent[i]));
+            //            Serial.println(itemName(trainContent[i]));
             output(2, 0, 15 * i, itemName(trainContent[i]));
         }
         oled.display();
