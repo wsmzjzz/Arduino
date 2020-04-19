@@ -25,8 +25,8 @@ int oledState = 000; // 000:Menu 111:BreakTime 222:Training 444:End
 String comdata = "";
 // 绿光LED for testing
 int ledPin = 13;
-int trainItems[15] = {0, 3,4};
-int numTrainItems = 2;
+int trainItems[15] = {0, 0, 0};
+int numTrainItems = 1;
 int nowItemIndex = 0;
 
 // 小组件编号 使用宏定义节省全局变量存储空间
@@ -89,14 +89,15 @@ void wxxcx_general_deal(String data)
     if (data == "delete")
     {
         --numTrainItems;
-        if (numTrainItems < 0) numTrainItems = 0;
+        if (numTrainItems < 0)
+            numTrainItems = 0;
         return;
     }
     else
     {
         ++numTrainItems;
         // if (data == "0")
-            trainItems[numTrainItems] = data.toInt();
+        trainItems[numTrainItems] = data.toInt();
         // else if (data == "fl")
         //     trainItems[numTrainItems] = 2;
         // else if (data == "psup")
@@ -159,7 +160,8 @@ void wxxcx_protocol_deal(String addr, String ctent)
 //“我的硬件”数据解析函数---不要动这个
 void wxxcx_analysis(String str)
 {
-    if (str.length() <= 2) {
+    if (str.length() <= 2)
+    {
         wxxcx_general_deal(str);
         return;
     }
@@ -295,6 +297,7 @@ void loop()
             RM = 10;
             lbChoosed = false;
             totalTime = 0;
+            nowItemIndex = 1;
             // delay(200);
         }
         oled.clearDisplay(); //清屏
