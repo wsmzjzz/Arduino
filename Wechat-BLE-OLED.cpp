@@ -8,9 +8,9 @@
 #define OLED_RESET 4
 Adafruit_SSD1306 oled(128, 64, &Wire, OLED_RESET);
 
-int group = 0; // 训练组数
-int lb = 5;    // weight
-int RM = 10;   // Repetition
+int sets = 0; // 训练组数
+int lb = 5;   // weight
+int RM = 10;  // Repetition
 int totalTime = 0;
 int workoutTime = 0;      // each training time
 int leftBtn = 12;         // minus- :
@@ -25,10 +25,55 @@ int oledState = 000; // 000:Menu 111:BreakTime 222:Training 444:End
 String comdata = "";
 // 绿光LED for testing
 int ledPin = 13;
+int trainContent[20];
+int ptrTrainCtnt = 0;
 // 小组件编号 使用宏定义节省全局变量存储空间
-#define red "010200" 
-#define slider0 "010300"
+#define Press "000100"
+#define IncPress "000101"
+#define Flies "000102"
+#define Pushup "000103"
+#define Squat "000104"
+#define Row "000105"
+#define Pullup "000106"
+#define Deadlift "000107"
+#define Lunge "000108"
+#define Situp "000109"
+#define BiCurl "000110"
+#define Pushdown "000111"
+#define Delete "000112"
+#define red "000200"
+#define slider0 "000300"
 #define vol "020507"
+#define input0 "010400"
+
+String itemName(int index) {
+    if (index == 0) return "Press";
+    if (index == 1) return "IncPress";
+    if (index == 2) return "Flies";
+    if (index == 3) return "Pushup";
+    if (index == 4) return "Squat";
+    if (index == 5) return "Row";
+    if (index == 6) return "Pullup";
+    if (index == 7) return "Deadlift";
+    if (index == 8) return "Lunge";
+    if (index == 9) return "Situp";
+    if (index == 10) return "BiCurl";
+    if (index == 11) return "PsDown";
+}
+int itemIndex(String name) {
+    if (name == "press") return 0;
+    if (name == "incpress") return 1;
+    if (name == "flies") return 2;
+    if (name == "pushup") return 3;
+    if (name == "squat") return 4;
+    if (name == "row") return 5;
+    if (name == "pullup") return 6;
+    if (name == "deadlift") return 7;
+    if (name == "lunge") return 8;
+    if (name == "situp") return 9;
+    if (name == "bicurl") return 10;
+    if (name == "pushdown") return 11;
+}
 
 //格式化发送
 void wxxcx_send(String addr, String data)
@@ -41,11 +86,21 @@ void wxxcx_general_deal(String data)
 {
     int val = 0;
 
-    if (data == "get") //按键发送过来的自定义数据
+    if (data == "delete" && ptrTrainCtnt > 0)
     {
-        //        val = analogRead(potpin); //读取模拟接口5 的值，并将其赋给val
-        wxxcx_send(vol, String(val));
+        --ptrTrainCtnt;
+    } else {
+        Serial.println("Here");
+        trainContent[++ptrTrainCtnt] = itemIndex(data);
+        Serial.println("Now Here");
+        Serial.println(trainContent[ptrTrainCtnt]);
+
     }
+    // if (data == "get") //按键发送过来的自定义数据
+    // {
+    //     //val = analogRead(potpin); //读取模拟接口5 的值，并将其赋给val
+    //     wxxcx_send(vol, String(val));
+    // }
 }
 //协议数据处理
 void wxxcx_protocol_deal(String addr, String ctent)
@@ -54,6 +109,8 @@ void wxxcx_protocol_deal(String addr, String ctent)
     {
         if (ctent == "true")
         {
+            delay(100);
+            wxxcx_send(input0, "Hello");
             digitalWrite(ledPin, HIGH); //点亮小灯
         }
         else
@@ -187,7 +244,7 @@ void setup()
 void loop()
 {
     // Bluetooth info exchange
-    
+
     // read info from HC-08(from Wechat) in one while loop
     while (Serial.available() > 0)
     {
@@ -208,7 +265,7 @@ void loop()
         {
             oledState = 111;
             // -----init-----
-            group = 0;
+            sets = 0;
             lb = 10;
             RM = 10;
             lbChoosed = false;
@@ -216,7 +273,10 @@ void loop()
             // delay(200);
         }
         oled.clearDisplay(); //清屏
-        output(2, 0, 0, "Menu");
+        // output(2, 0, 0, "Menu");
+        for (int i = 1; i <= ptrTrainCtnt; ++i) {
+            output(2, 0, 13*i, itemName(trainContent[i]));
+        }
         oled.display();
         // delay(1500);
 
@@ -251,7 +311,7 @@ void loop()
             {
                 oledState = 222; // 训练模式
                 workoutTime = 0; // 单次/一组训练时间
-                ++group;         // 组数
+                ++sets;          // 组数
 
                 // Count down 3 2 1 GO
                 oled.clearDisplay(); //清屏
@@ -310,8 +370,8 @@ void loop()
         }
         oled.clearDisplay(); //清屏
         // Gx Rxx
-        output(2, 0, 0, "G");
-        output(2, 0 + 13, 0, group);
+        output(2, 0, 0, "S");
+        output(2, 0 + 13, 0, sets);
         output(2, 45, 0, "R");
         output(2, 45 + 13, 0, RM);
         // time x'xx
