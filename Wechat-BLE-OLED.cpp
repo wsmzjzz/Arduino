@@ -117,14 +117,36 @@ void wxxcx_general_deal(String data)
     if (data == "delete")
     {
         --numTrainItems;
-        if (numTrainItems < 0) numTrainItems = 0;
+        if (numTrainItems < 0)
+            numTrainItems = 0;
     }
     else
     {
         //        Serial.println("Here");
         ++numTrainItems;
         // !!!!????------------------v--------------------<<<<
-        // trainContent[ptrTrainCtnt] = itemIndex(data);
+        Serial.println(data);
+        if (data == "press")
+            trainItems[numTrainItems] = 0;
+        if (data == "incpress")
+            trainItems[numTrainItems] = 1;
+        if (data == "flies")
+            trainItems[numTrainItems] = 2;
+        if (data == "pushup")
+            trainItems[numTrainItems] = 3;
+        if (data == "squat")
+            trainItems[numTrainItems] = 4;
+        if (data == "row")
+            trainItems[numTrainItems] = 5;
+        if (data == "pullup")
+            trainItems[numTrainItems] = 6;
+        //         if (data == "deadlift") trainItems[numTrainItems] = 7;
+        //         if (data == "lunge") trainItems[numTrainItems] = 8;
+        //         if (data == "situp") trainItems[numTrainItems] = 9;
+        // if (data == "bicurl") trainItems[numTrainItems] = 10;
+        // if (data == "pushdown") trainItems[numTrainItems] = 11;
+        //        Serial.println(itemIndex(data));
+        // trainItems[numTrainItems] = itemIndex(data);
         //        Serial.println("Now Here");
         //        Serial.println(trainContent[ptrTrainCtnt]);
     }
@@ -283,7 +305,7 @@ void loop()
         while (Serial.available() > 0)
         {
             comdata += char(Serial.read());
-            delay(2);
+            delay(3);
         }
         if (comdata.length() > 0)
         {
@@ -325,9 +347,12 @@ void loop()
             pressed(rightBtn) && rightRlsed && pressed(okBtn))
         {
             // after DONE!
-            if (ptrItem == numTrainItems) {
+            if (ptrItem == numTrainItems)
+            {
                 oledState = 444;
-            } else {
+            }
+            else
+            {
                 ++ptrItem;
                 sets = 0;
                 lbChoosed = false;
@@ -388,7 +413,7 @@ void loop()
 
         output(2, 0, 0, "S");
         output(2, 0 + 13, 0, sets + 1);
-        output(2, 30, 0, itemName(trainItems[ptrItem]);
+        output(2, 30, 0, itemName(trainItems[ptrItem]));
         if (!lbChoosed)
             output(2, 10, 25, ">");
         else
