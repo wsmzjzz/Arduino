@@ -27,6 +27,7 @@ String comdata = "";
 int ledPin = 13;
 int trainItems[15] = {0, 1, 2, 3, 4};
 int numTrainItems = 2;
+int nowItemIndex = 0;
 
 // 小组件编号 使用宏定义节省全局变量存储空间
 #define Press "000100"
@@ -88,16 +89,17 @@ void wxxcx_general_deal(String data)
     if (data == "delete")
     {
         --numTrainItems;
+        if (numTrainItems < 0) numTrainItems = 0;
     }
     else
     {
         ++numTrainItems;
         if (data == "pr")
             trainItems[numTrainItems] = 0;
-        // if (data == "fl")
-        //     trainItems[numTrainItems] = 2;
-        // if (data == "psup")
-        //     trainItems[numTrainItems] = 3;
+        if (data == "fl")
+            trainItems[numTrainItems] = 2;
+        if (data == "psup")
+            trainItems[numTrainItems] = 3;
         // if (data == "sq") trainItems[numTrainItems] = 4;
         // if (data == "rw") trainItems[numTrainItems] = 5;
         // if (data == "plup") trainItems[numTrainItems] = 6;
@@ -306,8 +308,13 @@ void loop()
         if (pressed(leftBtn) && leftRlsed && pressed(okBtn) ||
             pressed(rightBtn) && rightRlsed && pressed(okBtn))
         {
-
-            oledState = 444;
+            if (nowItemIndex == numTrainItems)
+                oledState = 444;
+            else
+            {
+                ++nowItemIndex;
+                sets = 0;
+            }
 
             oled.clearDisplay(); //清屏
             output(3, 20, 20, "DONE!");
@@ -361,14 +368,17 @@ void loop()
             onButtonEvent(RM, 1, 25);
 
         oled.clearDisplay(); //清屏
+        output(2, 0, 0, "S");
+        output(2, 0 + 13, 0, sets + 1);
+        output(2, 30, 0, itemName(trainItems[nowItemIndex]));
         if (!lbChoosed)
-            output(2, 10, 15, ">");
+            output(2, 10, 25, ">");
         else
-            output(2, 10, 35, ">");
-        output(2, 25, 15, "LBS:");
-        output(2, 75, 15, lb);
-        output(2, 25, 35, "REP:");
-        output(2, 75, 35, RM);
+            output(2, 10, 45, ">");
+        output(2, 25, 25, "LB:");
+        output(2, 75, 25, lb);
+        output(2, 25, 45, "RP:");
+        output(2, 75, 45, RM);
         oled.display();   // 开显示
     }                     // end of BreakTime
     if (oledState == 222) // Training Mode
@@ -380,6 +390,7 @@ void loop()
             totalTime += workoutTime;
             workoutTime = 0;
             lbChoosed = false;
+            // nowItemIndex
 
             oled.clearDisplay(); //清屏
             output(3, 20, 20, "Break");
