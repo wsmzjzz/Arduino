@@ -25,8 +25,9 @@ int oledState = 000; // 000:Menu 111:BreakTime 222:Training 444:End
 String comdata = "";
 // 绿光LED for testing
 int ledPin = 13;
-int trainContent[10] = {0, 1, 2, 3, 4};
-int ptrTrainCtnt = 2;
+int trainItems[10] = {0, 1, 2, 3, 4};
+int numTrainItems = 2;
+int ptrItem = 0;
 // 小组件编号 使用宏定义节省全局变量存储空间
 #define Press "000100"
 #define IncPress "000101"
@@ -67,11 +68,11 @@ String itemName(int index)
     if (index == 8)
         return "Lunge";
     if (index == 9)
-        return "Situp";
+        return "Sit-up";
     if (index == 10)
-        return "BiCurl";
+        return "BicepCurl";
     if (index == 11)
-        return "PsDown";
+        return "PushDown";
 }
 int itemIndex(String name)
 {
@@ -99,6 +100,7 @@ int itemIndex(String name)
         return 10;
     if (name == "pushdown")
         return 11;
+    return 0;
 }
 
 //格式化发送
@@ -112,14 +114,17 @@ void wxxcx_general_deal(String data)
 {
     int val = 0;
 
-    if (data == "delete" && ptrTrainCtnt > 0)
+    if (data == "delete")
     {
-        --ptrTrainCtnt;
+        --numTrainItems;
+        if (numTrainItems < 0) numTrainItems = 0;
     }
     else
     {
         //        Serial.println("Here");
-        //        trainContent[++ptrTrainCtnt] = itemIndex(data);
+        ++numTrainItems;
+        // !!!!????------------------v--------------------<<<<
+        // trainContent[ptrTrainCtnt] = itemIndex(data);
         //        Serial.println("Now Here");
         //        Serial.println(trainContent[ptrTrainCtnt]);
     }
@@ -288,12 +293,14 @@ void loop()
             comdata = "";
         }
 
-        if (pressed(leftBtn) || pressed(rightBtn))
+        if (pressed(okBtn))
         {
+            okRlsed = false;
             oledState = 111;
             // -----init-----
+            ptrItem = 1;
             sets = 0;
-            lb = 9;
+            lb = 10;
             RM = 10;
             lbChoosed = false;
             totalTime = 0;
@@ -301,10 +308,10 @@ void loop()
         }
         oled.clearDisplay(); //清屏
                              //        output(2, 0, 0, "Menu");
-        for (int i = 1; i <= ptrTrainCtnt; ++i)
+        for (int i = 1; i <= numTrainItems; ++i)
         {
             //            Serial.println(itemName(trainContent[i]));
-            output(2, 0, 15 * i, itemName(trainContent[i]));
+            output(2, 0, 15 * (i - 1), itemName(trainItems[i]));
         }
         oled.display();
         // delay(1500);
@@ -313,11 +320,18 @@ void loop()
     // BreakTime
     if (oledState == 111)
     {
-        // Combination shortcut to 'Fin.': -&ok | +&ok
+        // Combination shortcut to next item: -&ok | +&ok
         if (pressed(leftBtn) && leftRlsed && pressed(okBtn) ||
             pressed(rightBtn) && rightRlsed && pressed(okBtn))
         {
-            oledState = 444;
+            // after DONE!
+            if (ptrItem == numTrainItems) {
+                oledState = 444;
+            } else {
+                ++ptrItem;
+                sets = 0;
+                lbChoosed = false;
+            }
 
             oled.clearDisplay(); //清屏
             output(3, 20, 20, "DONE!");
@@ -327,7 +341,7 @@ void loop()
         // to 'Training'
         if (!pressed(okBtn))
             okRlsed = true;
-        if (pressed(okBtn))
+        if (pressed(okBtn) && okRlsed)
         {
             // first-time-press of 'ok': confirm LBS
             if (!lbChoosed && okRlsed)
@@ -374,7 +388,7 @@ void loop()
 
         output(2, 0, 0, "S");
         output(2, 0 + 13, 0, sets + 1);
-        output(2, 30, 0, "Press");
+        output(2, 30, 0, itemName(trainItems[ptrItem]);
         if (!lbChoosed)
             output(2, 10, 25, ">");
         else
