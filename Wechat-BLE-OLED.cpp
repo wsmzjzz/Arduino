@@ -301,6 +301,7 @@ void loop()
         if (pressed(leftBtn) && leftRlsed && pressed(okBtn) ||
             pressed(rightBtn) && rightRlsed && pressed(okBtn))
         {
+            
             oledState = 444;
 
             oled.clearDisplay(); //清屏
@@ -376,7 +377,7 @@ void loop()
             lbChoosed = false;
 
             oled.clearDisplay(); //清屏
-            output(4, 0, 18, "Break");
+            output(3, 20, 20, "Break");
             oled.display();
             delay(1000);
             goto NEXT;
@@ -388,11 +389,11 @@ void loop()
         output(2, 45, 0, "R");
         output(2, 45 + 13, 0, RM);
         // time x'xx
-        output(2, 0, 30, "time");
+        // output(2, 0, 30, "time");
         ++workoutTime;
-        output(2, 60, 30, workoutTime / 60);
-        output(2, 60 + 13, 30, "'");
-        output(2, 60 + 26, 30, workoutTime % 60);
+        output(3, 30, 30, workoutTime / 60);
+        output(3, 30 + 17, 30, "'");
+        output(3, 30 + 37, 30, workoutTime % 60);
 
         oled.display(); // 开显示
 
