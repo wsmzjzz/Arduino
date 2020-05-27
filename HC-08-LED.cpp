@@ -6,26 +6,17 @@
  作者：@DTJ
 ************************************************/
 
-int red_ledPin = 13;   //定义数字10 接口
-int yellow_ledPin = 6; //定义数字10 接口
-int green_ledPin = 7;  //定义数字10 接口
-int blue_ledPin = 8;   //定义数字10 接口
-int white_ledPin = 9;  //定义数字10 接口
-int potpin = 5;        //定义模拟接口5
+int ledPin= 13;
 
 #define red "010200"
-#define blue "020201"
-#define green "020202"
-#define yellow "020203"
-#define white "020204"
-#define slider0 "020300"
+#define slider0 "010300"
 #define vol "020507"
 
 //格式化发送
 void wxxcx_send(String addr, String data)
 {
     String sendbuff = "{#" + addr + ":" + data + "}"; //格式:{#控件ID:内容}
-    Serial.print(sendbuff);
+    Serial.println(sendbuff);
 }
 //非协议数据处理
 void wxxcx_general_deal(String data)
@@ -52,53 +43,22 @@ void wxxcx_protocol_deal(String addr, String ctent)
             digitalWrite(red_ledPin, LOW); //熄灭小灯
         }
     }
-    else if (addr == blue)
-    {
-        if (ctent == "true")
-        {
-            digitalWrite(blue_ledPin, HIGH); //点亮小灯
-        }
-        else
-        {
-            digitalWrite(blue_ledPin, LOW); //熄灭小灯
-        }
-    }
-    else if (addr == green)
-    {
-        if (ctent == "true")
-        {
-            digitalWrite(green_ledPin, HIGH); //点亮小灯
-        }
-        else
-        {
-            digitalWrite(green_ledPin, LOW); //熄灭小灯
-        }
-    }
-    else if (addr == yellow)
-    {
-        if (ctent == "true")
-        {
-            digitalWrite(yellow_ledPin, HIGH); //点亮小灯
-        }
-        else
-        {
-            digitalWrite(yellow_ledPin, LOW); //熄灭小灯
-        }
-    }
-    else if (addr == white)
-    {
-        if (ctent == "true")
-        {
-            digitalWrite(white_ledPin, HIGH); //点亮小灯
-        }
-        else
-        {
-            digitalWrite(white_ledPin, LOW); //熄灭小灯
-        }
-    }
+
     else if (addr == slider0)
     {
         //滑条的数据是十进制数，将 ctent 转为十进制即可
+        int data = ctent.toInt();
+
+        if (data > 10)
+        {
+            digitalWrite(red_ledPin, HIGH); //点亮小灯
+            wxxcx_send("010700", String(data));
+            Serial.println("***Sent");
+        }
+        else
+        {
+            digitalWrite(red_ledPin, LOW); //熄灭小灯
+        }
     }
 }
 //“我的硬件”数据解析函数
@@ -141,10 +101,6 @@ void setup()
 {
     Serial.begin(9600);          //设置波特率为9600
     pinMode(red_ledPin, OUTPUT); //定义小灯接口为输出接口
-    //  pinMode(yellow_ledPin, OUTPUT);//定义小灯接口为输出接口
-    //  pinMode(green_ledPin, OUTPUT);//定义小灯接口为输出接口
-    //  pinMode(blue_ledPin, OUTPUT);//定义小灯接口为输出接口
-    //  pinMode(white_ledPin, OUTPUT);//定义小灯接口为输出接口
 }
 void loop()
 {

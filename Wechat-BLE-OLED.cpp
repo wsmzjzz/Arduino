@@ -1,6 +1,15 @@
 /*
  * OLED显示
  */
+// #define USE_ARDUINO_INTERRUPTS true
+// #include <PulseSensorPlayground.h>
+
+// const int pulseWire = 0;
+// const int led = 13;
+// int threshold = 650;
+
+// PulseSensorPlayground pulseSensor;
+
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
@@ -248,6 +257,14 @@ void onButtonEvent(int &num, int lowBound, int upBound)
 void setup()
 {
     Serial.begin(9600);
+    // pulseSensor.analogInput(pulseWire);
+    // pulseSensor.blinkOnPulse(led);
+    // pulseSensor.setThreshold(threshold);
+
+    // if (pulseSensor.begin())
+    // {
+    //     Serial.println("Created!");
+    // }
     // 13 pin
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, LOW);
@@ -269,6 +286,7 @@ void setup()
 //----------------------------------------------
 void loop()
 {
+  
     // Menu
     if (oledState == 000)
     {
@@ -313,6 +331,16 @@ void loop()
     // BreakTime
     if (oledState == 111)
     {
+        // int BPM = pulseSensor.getBeatsPerMinute();
+
+        // if (pulseSensor.sawStartOfBeat())
+        // {
+        //     Serial.println(" * Happend! ");
+        //     Serial.println("BPM: ");
+        //     Serial.println(BPM);
+        // }
+        // delay(20);
+        
         // Combination shortcut to 'Fin.': -&ok | +&ok
         if (pressed(leftBtn) && leftRlsed && pressed(okBtn) ||
             pressed(rightBtn) && rightRlsed && pressed(okBtn))
